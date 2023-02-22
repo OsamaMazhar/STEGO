@@ -491,6 +491,9 @@ def my_app(cfg: DictConfig) -> None:
                 else:
                     m_param.requires_grad = False
             print(f'model layer: {mlayer_name}, requires grad: {m_param.requires_grad}')
+        else:
+            print(f'Weights not loaded due to inequal layer size in: {mlayer_name}')
+            print(f'model layer: {mlayer_name}, requires grad: {m_param.requires_grad}')
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
         default_hp_metric=False
