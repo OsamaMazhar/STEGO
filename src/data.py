@@ -483,6 +483,10 @@ class ContrastiveSegDataset(Dataset):
             self.n_classes = 3
             dataset_class = Coco
             extra_args = dict(coarse_labels=True, subset=6, exclude_things=True)
+        elif dataset_name == "cocostuff1":
+            self.n_classes = 1
+            dataset_class = Coco
+            extra_args = dict(coarse_labels=True, subset=2, exclude_things=False, object_name=cfg.object_name)
         elif dataset_name == "cocostuff15":
             self.n_classes = 15
             dataset_class = Coco
