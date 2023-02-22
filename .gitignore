@@ -7,5 +7,5 @@ src/dino
 src/__pycache__
 outputs/
 saved_models/
-datasets/*
+datasets/
 !datasets/minicoco.zip
