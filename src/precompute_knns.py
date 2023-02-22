@@ -36,8 +36,9 @@ def my_app(cfg: DictConfig) -> None:
     print(data_dir)
     print(cfg.output_root)
 
-    image_sets = ["val", "train"]
-    dataset_names = ["cocostuff27", "cityscapes", "potsdam"]
+    image_sets = ["train", 'val']
+    # dataset_names = ["cocostuff27", "cityscapes", "potsdam"]
+    dataset_names = ["cocostuff1"]
     crop_types = ["five", None]
 
     # Uncomment these lines to run on custom datasets
