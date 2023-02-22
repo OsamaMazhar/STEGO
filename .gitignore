@@ -1,5 +1,9 @@
 models/*
 data/*
-src/.env
+src/env
 results/predictions/*
 src/iarpa
+src/dino
+src/__pycache__
+outputs/
+saved_models/
