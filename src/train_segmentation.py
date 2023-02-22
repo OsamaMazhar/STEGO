@@ -71,10 +71,13 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
         else:
             raise ValueError("Unknown arch {}".format(cfg.arch))
 
+        # >>> These are the three layers which contain n_classes
+        # confirmed by looking at the model and checkpoint state_dict 
         self.train_cluster_probe = ClusterLookup(dim, n_classes)
 
         self.cluster_probe = ClusterLookup(dim, n_classes + cfg.extra_clusters)
         self.linear_probe = nn.Conv2d(dim, n_classes, (1, 1))
+        # <<<
 
         self.decoder = nn.Conv2d(dim, self.net.n_feats, (1, 1))
 
