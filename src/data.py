@@ -290,6 +290,12 @@ class Coco(Dataset):
             "plant-stuff",
             "sky-stuff",
         ]
+        # add category names and their corresponding id here:
+        category_names = {'elephant': 22, 'giraffe': 25}    
+
+        # update this list depending on the number of classes
+        self.cocostuff1_coarse_classes = [category_names[object_name]]
+
         self.cocostuff3_coarse_classes = [23, 22, 21]
         self.first_stuff_index = 12
 
