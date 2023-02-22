@@ -475,49 +475,67 @@ def my_app(cfg: DictConfig) -> None:
 
     val_loader = DataLoader(val_dataset, val_batch_size, shuffle=False, num_workers=cfg.num_workers, pin_memory=True)
 
-    project_home = '/home/osama/Programs/Shell_interview/Unsupervised_OS'
-    # model = LitUnsupervisedSegmenter.load_from_checkpoint(join(project_home, 'STEGO/outputs/checkpoints/cocostuff1-log/epoch=8-step=2399.ckpt'))
     model = LitUnsupervisedSegmenter(train_dataset.n_classes+1, cfg)
 
     saved_model_url_root = "https://marhamilresearch4.blob.core.windows.net/stego-public/saved_models/"
     saved_model_name = "cocostuff27_vit_base_5.ckpt"
+    saved_models_path = '../saved_models'
 
-    if not os.path.exists(join(project_home, 'STEGO', saved_model_name)):
-        wget.download(saved_model_url_root + saved_model_name, join(project_home, 'STEGO', saved_model_name))
-    checkpoint = torch.load(join(project_home, 'STEGO', saved_model_name), map_location='cpu') 
+    fine_tune_from_user_checkpoint = cfg.fine_tune_from_user_checkpoint
+    fine_tune_from_cocostuff27 = cfg.fine_tune_from_cocostuff27
 
+    if fine_tune_from_cocostuff27 and fine_tune_from_user_checkpoint:
+        print("Both fine_tune params cannot be True at once. Trying loading from the user checkpoint now!")
+        fine_tune_from_user_checkpoint = True
+        fine_tune_from_cocostuff27 = False
+
+    if fine_tune_from_cocostuff27:
+        if not os.path.exists(join(saved_models_path, saved_model_name)):
+            wget.download(saved_model_url_root + saved_model_name, join(saved_models_path, saved_model_name))
+        checkpoint = torch.load(join(saved_models_path, saved_model_name), map_location='cpu') 
+
+        # Checking which layers differ in shape between the checkpoint and the model created here.
     for ckp_name, model_name in zip(checkpoint['state_dict'], model.state_dict()):
         ckp_size = checkpoint['state_dict'][ckp_name].size()
         model_size = model.state_dict()[model_name].size()
         if not ckp_size == model_size:
             print(f'ckp_n: {ckp_name}, chk_s: {ckp_size}, mod_n: {model_name}, mod_s: {model_size}')
 
-    for idx, [clayer_name, [mlayer_name, m_param]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
+        # Loading weights layer by layer where shapes are identical
+        # define layers that you want to include in the training process
+        selected_layers = ['cluster2'] # all other same shape layers will be frozen
+
+        for _, [clayer_name, [mlayer_name, m_param]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
         clayer_size = checkpoint['state_dict'][clayer_name].size()
         malyer_size = model.state_dict()[mlayer_name].size()
         if clayer_size == malyer_size:
             c_weights = checkpoint['state_dict'][clayer_name]
             model.state_dict()[mlayer_name].copy_(c_weights)
-            selected_layers = ['cluster2']
             for layer_name in selected_layers:
                 if layer_name in mlayer_name:
                     m_param.requires_grad = True
                     break
                 else:
                     m_param.requires_grad = False
-            print(f'model layer: {mlayer_name}, requires grad: {m_param.requires_grad}')
         else:
-            print(f'Weights not loaded due to inequal layer size in: {mlayer_name}')
-            print(f'model layer: {mlayer_name}, requires grad: {m_param.requires_grad}')
+                print(f'Model layer: {mlayer_name}, weights not loaded due to inequal layer size')
+            print(f'Model layer: {mlayer_name}, Requires grad? {m_param.requires_grad}')
         
-    print("Weights loading check:...")
-    for idx, [clayer_name, [mlayer_name, _]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
+        print("Confirming if the weights are loaded correctly...")
+        for _, [clayer_name, [mlayer_name, _]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
         if checkpoint['state_dict'][clayer_name].size() == model.state_dict()[mlayer_name].size():
             equal = torch.all(torch.eq(checkpoint['state_dict'][clayer_name].cuda(), model.state_dict()[mlayer_name].cuda())).item()
             if not equal:
                 print(f'Tensors shape is same, still weights are not loaded in: {mlayer_name}')
         else:
-           print(f'Weights are not loaded in: {mlayer_name} due to unequal tensor shape.')
+                print(f'Model layer: {mlayer_name}, weights not loaded due to inequal layer size. This is not an error.')
+    
+    if fine_tune_from_user_checkpoint:
+        try:
+            model = LitUnsupervisedSegmenter.load_from_checkpoint(cfg.user_checkpoint_path)
+            print("Model loaded from the user checkpoint successfully!")
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
 
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
