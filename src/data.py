@@ -234,7 +234,7 @@ class Coco(Dataset):
                  coarse_labels, exclude_things, subset=None, object_name=None):
         super(Coco, self).__init__()
         self.split = image_set
-        self.root = join(root, "cocostuff")
+        self.root = join(root, "minicoco")
         self.coarse_labels = coarse_labels
         self.transform = transform
         self.label_transform = target_transform
@@ -294,7 +294,7 @@ class Coco(Dataset):
         category_names = {'elephant': 22, 'giraffe': 25}    
 
         # update this list depending on the number of classes
-        self.cocostuff1_coarse_classes = [category_names[object_name]]
+        self.minicoco_coarse_classes = [category_names[object_name]]
 
         self.cocostuff3_coarse_classes = [23, 22, 21]
         self.first_stuff_index = 12
@@ -319,13 +319,13 @@ class Coco(Dataset):
         if self.coarse_labels:
             coarser_labels = -torch.ones_like(label)
             if self.subset == 2:
-                coarser_class = self.cocostuff1_coarse_classes
+                coarser_class = self.minicoco_coarse_classes
                 for i, c in enumerate(coarser_class):
                     coarser_labels[torch.where(label == c-1)] = i+1
             else:
                 coarser_class = self.cocostuff3_coarse_classes
                 for i, c in enumerate(coarser_class):
-                coarser_labels[coarse_label == c] = i
+                    coarser_labels[coarse_label == c] = i
             return img, coarser_labels, coarser_labels >= 0
         else:
             if self.exclude_things:
@@ -483,7 +483,7 @@ class ContrastiveSegDataset(Dataset):
             self.n_classes = 3
             dataset_class = Coco
             extra_args = dict(coarse_labels=True, subset=6, exclude_things=True)
-        elif dataset_name == "cocostuff1":
+        elif dataset_name == "minicoco":
             self.n_classes = 1
             dataset_class = Coco
             extra_args = dict(coarse_labels=True, subset=2, exclude_things=False, object_name=cfg.object_name)
