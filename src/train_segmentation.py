@@ -494,6 +494,16 @@ def my_app(cfg: DictConfig) -> None:
         else:
             print(f'Weights not loaded due to inequal layer size in: {mlayer_name}')
             print(f'model layer: {mlayer_name}, requires grad: {m_param.requires_grad}')
+        
+    print("Weights loading check:...")
+    for idx, [clayer_name, [mlayer_name, _]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
+        if checkpoint['state_dict'][clayer_name].size() == model.state_dict()[mlayer_name].size():
+            equal = torch.all(torch.eq(checkpoint['state_dict'][clayer_name].cuda(), model.state_dict()[mlayer_name].cuda())).item()
+            if not equal:
+                print(f'Tensors shape is same, still weights are not loaded in: {mlayer_name}')
+        else:
+           print(f'Weights are not loaded in: {mlayer_name} due to unequal tensor shape.')
+
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
         default_hp_metric=False
