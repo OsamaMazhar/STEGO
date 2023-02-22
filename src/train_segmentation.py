@@ -372,16 +372,26 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
             self.cluster_metrics.reset()
 
     def configure_optimizers(self):
-        main_params = list(self.net.parameters())
+        selected_layers = ['cluster2.0.weight', 'cluster2.0.bias', \
+                            'cluster2.2.weight', 'cluster2.2.bias']
+        cluster2_nparams = list(filter(lambda kv: kv[0] in selected_layers, self.net.named_parameters()))
+        cluster2_params = [param for _, param in cluster2_nparams]
+        
+        main_nparams = list(filter(lambda kv: kv[0] not in selected_layers, self.net.named_parameters()))
+        main_params = [param for _, param in main_nparams]
+
+        # main_params = list(self.net.parameters())
 
         if self.cfg.rec_weight > 0:
             main_params.extend(self.decoder.parameters())
 
-        net_optim = torch.optim.Adam(main_params, lr=self.cfg.lr)
-        linear_probe_optim = torch.optim.Adam(list(self.linear_probe.parameters()), lr=5e-3)
-        cluster_probe_optim = torch.optim.Adam(list(self.cluster_probe.parameters()), lr=5e-3)
+        net_optim = torch.optim.Adam(main_params, lr=self.cfg.fine_tine_lr)
+        # Changed learning rate from 5e-3 to 1e-4
+        cluster_probe_optim = torch.optim.Adam(list(self.cluster_probe.parameters()), lr=self.cfg.lr)
+        linear_probe_optim = torch.optim.Adam(list(self.linear_probe.parameters()), lr=self.cfg.lr)
+        cluster2_optim = torch.optim.Adam(cluster2_params, lr=self.cfg.lr)
 
-        return net_optim, linear_probe_optim, cluster_probe_optim
+        return net_optim, linear_probe_optim, cluster_probe_optim, cluster2_optim
 
 
 @hydra.main(config_path="configs", config_name="train_config.yml")
