@@ -231,7 +231,7 @@ class PotsdamRaw(Dataset):
 
 class Coco(Dataset):
     def __init__(self, root, image_set, transform, target_transform,
-                 coarse_labels, exclude_things, subset=None):
+                 coarse_labels, exclude_things, subset=None, object_name=None):
         super(Coco, self).__init__()
         self.split = image_set
         self.root = join(root, "cocostuff")
