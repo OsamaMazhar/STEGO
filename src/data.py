@@ -241,19 +241,22 @@ class Coco(Dataset):
         self.subset = subset
         self.exclude_things = exclude_things
 
-        if self.subset is None:
-            self.image_list = "Coco164kFull_Stuff_Coarse.txt"
-        elif self.subset == 6:  # IIC Coarse
-            self.image_list = "Coco164kFew_Stuff_6.txt"
-        elif self.subset == 7:  # IIC Fine
-            self.image_list = "Coco164kFull_Stuff_Coarse_7.txt"
-
+        self.object_name = object_name
         assert self.split in ["train", "val", "train+val"]
         split_dirs = {
             "train": ["train2017"],
             "val": ["val2017"],
             "train+val": ["train2017", "val2017"]
         }
+        
+        if self.subset is None:
+            self.image_list = "Coco164kFull_Stuff_Coarse.txt"
+        elif self.subset == 6:  # IIC Coarse
+            self.image_list = "Coco164kFew_Stuff_6.txt"
+        elif self.subset == 7:  # IIC Fine
+            self.image_list = "Coco164kFull_Stuff_Coarse_7.txt"
+        elif self.subset == 2:  # My custom 1 class coco
+            self.image_list = "COCO_{}_{}.txt".format(object_name, split_dirs[self.split][0])
 
         self.image_files = []
         self.label_files = []
