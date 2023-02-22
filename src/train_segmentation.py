@@ -229,6 +229,7 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
         net_optim.step()
         cluster_probe_optim.step()
         linear_probe_optim.step()
+        cluster2_optim.step()
 
         if self.cfg.reset_probe_steps is not None and self.global_step == self.cfg.reset_probe_steps:
             print("RESETTING PROBES")
