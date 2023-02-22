@@ -394,7 +394,7 @@ def my_app(cfg: DictConfig) -> None:
     checkpoint_dir = join(cfg.output_root, "checkpoints")
 
     prefix = "{}/{}_{}".format(cfg.log_dir, cfg.dataset_name, cfg.experiment_name)
-    name = '{}_date_{}'.format(prefix, datetime.now().strftime('%b%d_%H-%M-%S'))
+    name = '{}_date_{}_{}'.format(prefix, datetime.now().strftime('%b%d_%H-%M-%S'), cfg.object_name)
     cfg.full_name = prefix
 
     os.makedirs(data_dir, exist_ok=True)
