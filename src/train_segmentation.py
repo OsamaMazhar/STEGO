@@ -234,8 +234,8 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
             print("RESETTING PROBES")
             self.linear_probe.reset_parameters()
             self.cluster_probe.reset_parameters()
-            self.trainer.optimizers[1] = torch.optim.Adam(list(self.linear_probe.parameters()), lr=5e-3)
-            self.trainer.optimizers[2] = torch.optim.Adam(list(self.cluster_probe.parameters()), lr=5e-3)
+            self.trainer.optimizers[1] = torch.optim.Adam(list(self.linear_probe.parameters()), lr=self.cfg.reset_probe_lr)
+            self.trainer.optimizers[2] = torch.optim.Adam(list(self.cluster_probe.parameters()), lr=self.cfg.reset_probe_lr)
 
         if self.global_step % 2000 == 0 and self.global_step > 0:
             print("RESETTING TFEVENT FILE")

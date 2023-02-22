@@ -41,6 +41,8 @@ dropout: True
 zero_clamp: True
 
 lr: 5e-4
+reset_probe_lr: 5e-3
+fine_tine_lr: 1e-4
 pretrained_weights: ~
 use_salience: False
 stabalize: False
