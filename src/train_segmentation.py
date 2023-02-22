@@ -113,11 +113,12 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         # training_step defined the train loop.
         # It is independent of forward
-        net_optim, linear_probe_optim, cluster_probe_optim = self.optimizers()
+        net_optim, linear_probe_optim, cluster_probe_optim, cluster2_optim= self.optimizers()
 
         net_optim.zero_grad()
         linear_probe_optim.zero_grad()
         cluster_probe_optim.zero_grad()
+        cluster2_optim.zero_grad()
 
         with torch.no_grad():
             ind = batch["ind"]
