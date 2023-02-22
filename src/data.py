@@ -318,7 +318,13 @@ class Coco(Dataset):
 
         if self.coarse_labels:
             coarser_labels = -torch.ones_like(label)
-            for i, c in enumerate(self.cocostuff3_coarse_classes):
+            if self.subset == 2:
+                coarser_class = self.cocostuff1_coarse_classes
+                for i, c in enumerate(coarser_class):
+                    coarser_labels[torch.where(label == c-1)] = i+1
+            else:
+                coarser_class = self.cocostuff3_coarse_classes
+                for i, c in enumerate(coarser_class):
                 coarser_labels[coarse_label == c] = i
             return img, coarser_labels, coarser_labels >= 0
         else:
