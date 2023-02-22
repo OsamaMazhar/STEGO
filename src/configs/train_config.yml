@@ -1,10 +1,15 @@
-output_root: '../'
+output_root: '../outputs'
 pytorch_data_dir: '/datadrive/pytorch-data/'
 experiment_name: "exp1"
-log_dir: "cocostuff1-log"
+log_dir: "minicoco-log"
 azureml_logging: False
 submitting_to_aml: False
+
+# object_name currently supports "elephant" and "giraffe".
 object_name: "elephant"
+fine_tune_from_cocostuff27: True
+fine_tune_from_user_checkpoint: True
+user_checkpoint_path: '../saved_models/epoch=17-step=4799.ckpt'
 
 # Loader params
 num_workers: 6
@@ -12,7 +17,7 @@ max_steps: 5000
 batch_size: 8
 
 num_neighbors: 7
-dataset_name: "cocostuff1"
+dataset_name: "minicoco"
 
 # Used if dataset_name is "directory"
 dir_dataset_name: ~
