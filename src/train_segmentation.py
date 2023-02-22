@@ -14,6 +14,7 @@ import torch.multiprocessing
 import seaborn as sns
 from pytorch_lightning.callbacks import ModelCheckpoint
 import sys
+import wget
 
 torch.multiprocessing.set_sharing_strategy('file_system')
 
@@ -459,8 +460,13 @@ def my_app(cfg: DictConfig) -> None:
 
     val_loader = DataLoader(val_dataset, val_batch_size, shuffle=False, num_workers=cfg.num_workers, pin_memory=True)
 
-    model = LitUnsupervisedSegmenter(train_dataset.n_classes, cfg)
+    project_home = '/home/osama/Programs/Shell_interview/Unsupervised_OS'
+    saved_model_url_root = "https://marhamilresearch4.blob.core.windows.net/stego-public/saved_models/"
+    saved_model_name = "cocostuff27_vit_base_5.ckpt"
 
+    if not os.path.exists(join(project_home, 'STEGO', saved_model_name)):
+        wget.download(saved_model_url_root + saved_model_name, join(project_home, 'STEGO', saved_model_name))
+    checkpoint = torch.load(join(project_home, 'STEGO', saved_model_name), map_location='cpu') 
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
         default_hp_metric=False
