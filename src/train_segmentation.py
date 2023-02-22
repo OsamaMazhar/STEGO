@@ -476,6 +476,21 @@ def my_app(cfg: DictConfig) -> None:
         model_size = model.state_dict()[model_name].size()
         if not ckp_size == model_size:
             print(f'ckp_n: {ckp_name}, chk_s: {ckp_size}, mod_n: {model_name}, mod_s: {model_size}')
+
+    for idx, [clayer_name, [mlayer_name, m_param]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
+        clayer_size = checkpoint['state_dict'][clayer_name].size()
+        malyer_size = model.state_dict()[mlayer_name].size()
+        if clayer_size == malyer_size:
+            c_weights = checkpoint['state_dict'][clayer_name]
+            model.state_dict()[mlayer_name].copy_(c_weights)
+            selected_layers = ['cluster2']
+            for name in selected_layers:
+                if name in mlayer_name:
+                    m_param.requires_grad = True
+                    break
+                else:
+                    m_param.requires_grad = False
+            print(f'model layer: {mlayer_name}, requires grad: {m_param.requires_grad}')
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
         default_hp_metric=False
