@@ -37,7 +37,8 @@ projection_type: "nonlinear"
 dino_patch_size: 8
 granularity: 1
 continuous: True
-dim: 70
+# dim: 70
+dim: 90
 dropout: True
 zero_clamp: True
 
