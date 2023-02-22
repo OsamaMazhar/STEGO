@@ -484,8 +484,8 @@ def my_app(cfg: DictConfig) -> None:
             c_weights = checkpoint['state_dict'][clayer_name]
             model.state_dict()[mlayer_name].copy_(c_weights)
             selected_layers = ['cluster2']
-            for name in selected_layers:
-                if name in mlayer_name:
+            for layer_name in selected_layers:
+                if layer_name in mlayer_name:
                     m_param.requires_grad = True
                     break
                 else:
