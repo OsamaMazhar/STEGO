@@ -461,6 +461,9 @@ def my_app(cfg: DictConfig) -> None:
     val_loader = DataLoader(val_dataset, val_batch_size, shuffle=False, num_workers=cfg.num_workers, pin_memory=True)
 
     project_home = '/home/osama/Programs/Shell_interview/Unsupervised_OS'
+    # model = LitUnsupervisedSegmenter.load_from_checkpoint(join(project_home, 'STEGO/outputs/checkpoints/cocostuff1-log/epoch=8-step=2399.ckpt'))
+    model = LitUnsupervisedSegmenter(train_dataset.n_classes+1, cfg)
+
     saved_model_url_root = "https://marhamilresearch4.blob.core.windows.net/stego-public/saved_models/"
     saved_model_name = "cocostuff27_vit_base_5.ckpt"
 
