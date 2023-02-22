@@ -165,7 +165,7 @@ color_space: "rgb"
 reset_probe_steps: ~
 
 # Logging params
-n_images: 5
+n_images: 2
 scalar_log_freq: 10
 checkpoint_freq: 50
 val_freq: 100
