@@ -470,6 +470,12 @@ def my_app(cfg: DictConfig) -> None:
     if not os.path.exists(join(project_home, 'STEGO', saved_model_name)):
         wget.download(saved_model_url_root + saved_model_name, join(project_home, 'STEGO', saved_model_name))
     checkpoint = torch.load(join(project_home, 'STEGO', saved_model_name), map_location='cpu') 
+
+    for ckp_name, model_name in zip(checkpoint['state_dict'], model.state_dict()):
+        ckp_size = checkpoint['state_dict'][ckp_name].size()
+        model_size = model.state_dict()[model_name].size()
+        if not ckp_size == model_size:
+            print(f'ckp_n: {ckp_name}, chk_s: {ckp_size}, mod_n: {model_name}, mod_s: {model_size}')
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
         default_hp_metric=False
