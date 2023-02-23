@@ -1,3 +1,6 @@
+## Added 22-02-2023: Fine-tuning STEGO for 1-class object segmentation:
+The changes have been made in the files. The details will be updated in the Readme file soon. Stay tuned.
+
 # STEGO: Unsupervised Semantic Segmentation by Distilling Feature Correspondences
 ### [Project Page](https://mhamilton.net/stego.html) | [Paper](https://arxiv.org/abs/2203.08414) | [Video](https://aka.ms/stego-video) | [ICLR 2022](https://iclr.cc/virtual/2022/poster/6068) 
 
