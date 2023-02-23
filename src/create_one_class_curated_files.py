@@ -2,7 +2,7 @@ import os
 from pycocotools.coco import COCO
 from tqdm import tqdm
 
-data_dir = './dataset'
+data_dir = '../datasets'
 cat_names = ['elephant', 'giraffe']
 for data_type in ['train2017', 'val2017']:
     for idx, cat_name in enumerate(cat_names):
