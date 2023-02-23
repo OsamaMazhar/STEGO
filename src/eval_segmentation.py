@@ -67,7 +67,7 @@ def my_app(cfg: DictConfig) -> None:
         model = LitUnsupervisedSegmenter.load_from_checkpoint(model_path)
         print(OmegaConf.to_yaml(model.cfg))
 
-        run_picie = cfg.run_picie and model.cfg.dataset_name == "cocostuff27"
+        run_picie = cfg.run_picie and model.cfg.dataset_name == "cocostuff1"
         if run_picie:
             picie_state = torch.load("../saved_models/picie_and_probes.pth")
             picie = picie_state["model"].cuda()
@@ -100,7 +100,10 @@ def my_app(cfg: DictConfig) -> None:
             if run_picie:
                 par_picie = picie
 
-        if model.cfg.dataset_name == "cocostuff27":
+        if model.cfg.dataset_name == "cocostuff1":
+            # all_good_images = range(80)
+            all_good_images = [5, 16, 18, 20, 30, 31, 33, 39, 46, 47, 50, 51] # elephant poor
+        elif model.cfg.dataset_name == "cocostuff27":
             # all_good_images = range(10)
             # all_good_images = range(250)
             # all_good_images = [61, 60, 49, 44, 13, 70] #Failure cases
