@@ -1,5 +1,67 @@
-## Added 22-02-2023: Fine-tuning STEGO for 1-class object segmentation:
-The changes have been made in the files. The details will be updated in the Readme file soon. Stay tuned.
+## Fine-tuning STEGO for single-class object segmentation:
+This is an unofficial implementation to finetune a pretrained model. This work also supports training segmentation models for only single-class dataset (default implementation). Moreover, no anaconda is required anymore. All the packages can be installed via pip in a python virtual environment. All copyrights are owned by the original author(s). The changes are made solely for academic purpose.
+
+STEGO failed to work in Windows 11 with the same pip packages. The following guide has been written and tested on elementary OS 6.1 (built on Ubuntu 20.04.5 LTS).
+ 
+To start, we install Python 3.8 and clone this fork into your projects folder and enter into the STEGO source folder.
+
+### Clone the repository:
+```
+git clone https://github.com/OsamaMazhar/STEGO.git
+cd STEGO/src
+```
+
+### Create a virtual environment:
+Now create a virtual environment and activate it.
+```
+python3 -m venv env
+source env/bin/activate
+```
+
+### Install required packages:
+Now install the require packages simply via pip.
+```
+pip install -r ../requirements.txt
+```
+
+### Unzip the dummy dataset:
+This fork comes with a mini dataset i.e., Minicoco, with a subset of images taken from COCO2017 dataset. It is only meant to undersand the folder structure of the code. Minicoco is a derivative of the COCO dataset. The authors of COCO do not in any form endorse this work. Different licenses apply:
+- COCO images: [Flickr Terms of use](http://cocodataset.org/#termsofuse)
+- COCO annotations: [Creative Commons Attribution 4.0 License](http://cocodataset.org/#termsofuse)
+- COCO-Stuff annotations & code: [Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/legalcode)
+
+From the folder STEGO/datasets, unzip the file minicoco.zip
+```
+cd ../datasets
+unzip minicoco.zip
+cd ../src
+```
+### Crop the dataset:
+Now run file `crop_dataset.py` to apply FiveCrop operation on the minicoco images.
+```
+python crop_dataset.py
+```
+
+### Compute Nearest Neighbours:
+Now computer nearest neighbours of the cropped images using file ```precompute_knns.py```
+```
+python precompute_knns.py
+```
+
+### Start training:
+You can now simply start training the model by the following command:
+```
+python train_segmentation.py
+```
+
+###Notes:
+Please make necessary changes to the code, and config files to suit your preference. This implementation supports loading from pretrained STEGO models. Please set the params in the ```train_eval.yml``` file.
+
+Below is the official README file.
+
+---
+
+
 
 # STEGO: Unsupervised Semantic Segmentation by Distilling Feature Correspondences
 ### [Project Page](https://mhamilton.net/stego.html) | [Paper](https://arxiv.org/abs/2203.08414) | [Video](https://aka.ms/stego-video) | [ICLR 2022](https://iclr.cc/virtual/2022/poster/6068) 
