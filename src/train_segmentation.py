@@ -35,6 +35,9 @@ def get_class_labels(dataset_name):
             "furniture", "rawmaterial", "textile", "wall", "window",
             "building", "ground", "plant", "sky", "solid",
             "structural", "water"]
+    elif dataset_name == "cocostuff1":
+        return [
+            "elephant"]
     elif dataset_name == "voc":
         return [
             'background',
@@ -377,6 +380,7 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
             self.cluster_metrics.reset()
 
     def configure_optimizers(self):
+        if self.cfg.fine_tune_from_cocostuff27 or self.cfg.fine_tune_from_user_checkpoint:
         selected_layers = ['cluster2.0.weight', 'cluster2.0.bias', \
                             'cluster2.2.weight', 'cluster2.2.bias']
         cluster2_nparams = list(filter(lambda kv: kv[0] in selected_layers, self.net.named_parameters()))
@@ -384,14 +388,15 @@ class LitUnsupervisedSegmenter(pl.LightningModule):
         
         main_nparams = list(filter(lambda kv: kv[0] not in selected_layers, self.net.named_parameters()))
         main_params = [param for _, param in main_nparams]
-
-        # main_params = list(self.net.parameters())
+            fine_tune_lr = self.cfg.fine_tune_lr
+        else:
+            main_params = list(self.net.parameters())
+            fine_tune_lr = self.cfg.lr
 
         if self.cfg.rec_weight > 0:
             main_params.extend(self.decoder.parameters())
 
-        net_optim = torch.optim.Adam(main_params, lr=self.cfg.fine_tine_lr)
-        # Changed learning rate from 5e-3 to 1e-4
+        net_optim = torch.optim.Adam(main_params, lr=fine_tune_lr)
         cluster_probe_optim = torch.optim.Adam(list(self.cluster_probe.parameters()), lr=self.cfg.lr)
         linear_probe_optim = torch.optim.Adam(list(self.linear_probe.parameters()), lr=self.cfg.lr)
         cluster2_optim = torch.optim.Adam(cluster2_params, lr=self.cfg.lr)
@@ -532,10 +537,27 @@ def my_app(cfg: DictConfig) -> None:
     
     if fine_tune_from_user_checkpoint:
         try:
+            checkpoint = torch.load(cfg.user_checkpoint_path, map_location='cpu') 
             model = LitUnsupervisedSegmenter.load_from_checkpoint(cfg.user_checkpoint_path)
+            selected_layers = ['cluster2', 'train_cluster', 'cluster_probe', 'linear_probe'] # all other same shape layers will be frozen
+            for _, [clayer_name, [mlayer_name, m_param]] in enumerate(zip(checkpoint['state_dict'], model.named_parameters())):
+                if checkpoint['state_dict'][clayer_name].size() == model.state_dict()[mlayer_name].size():
+                    equal = torch.all(torch.eq(checkpoint['state_dict'][clayer_name].cuda(), model.state_dict()[mlayer_name].cuda())).item()
+                    if not equal:
+                        print(f'Tensors shape is same, still weights are not loaded in: {mlayer_name}')
+                else:
+                    print(f'Model layer: {mlayer_name}, weights not loaded due to inequal layer size. This is not an error.')
+                for layer_name in selected_layers:
+                    if layer_name in mlayer_name:
+                        m_param.requires_grad = True
+                        break
+                    else:
+                        m_param.requires_grad = False
+                print(f'Model layer: {mlayer_name}, Requires grad? {m_param.requires_grad}')
             print("Model loaded from the user checkpoint successfully!")
         except Exception as err:
             print(f"Unexpected {err=}, {type(err)=}")
+            os._exit()
 
     tb_logger = TensorBoardLogger(
         join(log_dir, name),
