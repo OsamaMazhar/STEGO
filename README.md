@@ -2,7 +2,7 @@
 This is an unofficial implementation to finetune a pretrained model. This work also supports training segmentation models for only single-class dataset (default implementation). Moreover, no anaconda is required anymore. All the packages can be installed via pip in a python virtual environment. All copyrights are owned by the original author(s). The changes are made solely for academic purpose.
 
 STEGO failed to work in Windows 11 with the same pip packages. The following guide has been written and tested on elementary OS 6.1 (built on Ubuntu 20.04.5 LTS).
- 
+
 To start, we install Python 3.8 and clone this fork into your projects folder and enter into the STEGO source folder.
 
 ### Clone the repository:
@@ -54,7 +54,7 @@ You can now simply start training the model by the following command:
 python train_segmentation.py
 ```
 
-###Notes:
+### Notes:
 Please make necessary changes to the code, and config files to suit your preference. This implementation supports loading from pretrained STEGO models. Please set the params in the ```train_eval.yml``` file.
 
 Below is the official README file.
